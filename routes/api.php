@@ -19,4 +19,10 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-// Route::get('/home', [UsuarioController::class, 'home']);
+
+
+Route::get('/home', [UsuarioController::class, 'home']);
+
+Route::prefix('usuarios')->group(function () {
+    Route::post('/login', [UsuarioController::class, 'login']);
+});

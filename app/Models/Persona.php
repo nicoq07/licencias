@@ -41,4 +41,17 @@ use Illuminate\Database\Eloquent\Model;
 class Persona extends Model
 {
     use HasFactory;
+
+    public function usuario()
+    {
+        return $this->hasOne(Usuario::class);
+    }
+    public function grupoSanguineo()
+    {
+        return $this->belongsTo(GrupoSanguineo::class, 'grupo_sanguineo_id');
+    }
+    public function tipoDocumento()
+    {
+        return $this->belongsTo(TipoDocumento::class, 'tipo_documento_id');
+    }
 }

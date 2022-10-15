@@ -27,4 +27,9 @@ use Illuminate\Database\Eloquent\Model;
 class Pregunta extends Model
 {
     use HasFactory;
+
+    public function respuesta()
+    {
+        return $this->belongsTo(Respuesta::class);
+    }
 }

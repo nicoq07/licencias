@@ -35,4 +35,18 @@ use Illuminate\Database\Eloquent\Model;
 class Usuario extends Model
 {
     use HasFactory;
+
+    public function persona()
+    {
+        return $this->belongsTo(Persona::class, 'persona_id');
+    }
+
+    public function tokens()
+    {
+        return $this->hasMany(TokenUsuario::class);
+    }
+    public function examenes()
+    {
+        return $this->hasMany(Examen::class);
+    }
 }

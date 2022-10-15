@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class GrupoSanguineoSeeder extends Seeder
 {
@@ -14,6 +15,29 @@ class GrupoSanguineoSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table('grupos_sanguineos')->insert([
+            'descripcion' => 'A+',
+        ]);
+        DB::table('grupos_sanguineos')->insert([
+            'descripcion' => 'A-',
+        ]);
+        DB::table('grupos_sanguineos')->insert([
+            'descripcion' => 'B+',
+        ]);
+        DB::table('grupos_sanguineos')->insert([
+            'descripcion' => 'B-',
+        ]);
+        DB::table('grupos_sanguineos')->insert([
+            'descripcion' => 'AB+',
+        ]);
+        DB::table('grupos_sanguineos')->insert([
+            'descripcion' => 'AB-',
+        ]);
+        DB::table('grupos_sanguineos')->insert([
+            'descripcion' => '0+',
+        ]);
+        DB::table('grupos_sanguineos')->insert([
+            'descripcion' => '0-',
+        ]);
     }
 }

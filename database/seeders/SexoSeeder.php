@@ -16,13 +16,13 @@ class SexoSeeder extends Seeder
     public function run()
     {
         //
-        DB::table('roles')->insert([
+        DB::table('sexos')->insert([
             'descripcion' => 'Masculino',
         ]);
-        DB::table('roles')->insert([
+        DB::table('sexos')->insert([
             'descripcion' => 'Femenino',
         ]);
-        DB::table('roles')->insert([
+        DB::table('sexos')->insert([
             'descripcion' => 'X',
         ]);
     }

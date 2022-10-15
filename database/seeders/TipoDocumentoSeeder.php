@@ -15,16 +15,16 @@ class TipoDocumentoSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('roles')->insert([
+        DB::table('tipos_documento')->insert([
             'descripcion' => 'D.N.I',
         ]);
-        DB::table('roles')->insert([
+        DB::table('tipos_documento')->insert([
             'descripcion' => 'L.C',
         ]);
-        DB::table('roles')->insert([
+        DB::table('tipos_documento')->insert([
             'descripcion' => 'L.E',
         ]);
-        DB::table('roles')->insert([
+        DB::table('tipos_documento')->insert([
             'descripcion' => 'C.I',
         ]);
     }

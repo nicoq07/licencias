@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             LicenciaClaseSeeder::class,
             RolSeeder::class,
             SexoSeeder::class,
-            TipoDocumentoSeeder::class
+            TipoDocumentoSeeder::class,
+            PersonaSeeder::class
         ]);
     }
 }

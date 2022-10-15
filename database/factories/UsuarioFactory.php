@@ -14,10 +14,13 @@ class UsuarioFactory extends Factory
      *
      * @return array<string, mixed>
      */
+
+    protected $model = Usuario::class;
+
     public function definition()
     {
         return [
-            //
+            ''
         ];
     }
 }

@@ -31,6 +31,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Usuario whereRolId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Usuario whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Examen[] $examenes
+ * @property-read int|null $examenes_count
+ * @property-read \App\Models\Persona $persona
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TokenUsuario[] $tokens
+ * @property-read int|null $tokens_count
  */
 class Usuario extends Model
 {

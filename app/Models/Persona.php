@@ -37,6 +37,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Persona whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Persona whereUtilizaAnteojos($value)
  * @mixin \Eloquent
+ * @property-read \App\Models\GrupoSanguineo $grupoSanguineo
+ * @property-read \App\Models\TipoDocumento $tipoDocumento
+ * @property-read \App\Models\Usuario|null $usuario
  */
 class Persona extends Model
 {

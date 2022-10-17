@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Pregunta whereRespuestaId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Pregunta whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \App\Models\Respuesta $respuesta
  */
 class Pregunta extends Model
 {

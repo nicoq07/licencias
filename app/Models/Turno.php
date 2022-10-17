@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Turno whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Turno whereUsuarioId($value)
  * @mixin \Eloquent
+ * @property-read \App\Models\Usuario $usuario
  */
 class Turno extends Model
 {

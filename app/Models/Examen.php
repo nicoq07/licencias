@@ -29,9 +29,21 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Examen whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Examen whereUsuarioId($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Pregunta[] $preguntas
+ * @property-read int|null $preguntas_count
+ * @property-read \App\Models\Usuario $usuario
  */
 class Examen extends Model
 {
     protected $table = 'examenes';
     use HasFactory;
+
+    public function preguntas()
+    {
+        return $this->belongsToMany(Pregunta::class);
+    }
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class);
+    }
 }

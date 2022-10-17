@@ -3,13 +3,12 @@
 namespace Database\Factories;
 
 
-use App\Models\Respuesta;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Pregunta>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PreguntaExamen>
  */
-class PreguntaFactory extends Factory
+class ExamenPreguntaFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -20,8 +19,9 @@ class PreguntaFactory extends Factory
     {
         return [
             //
-            'descripcion' => $this->faker->sentence(5),
-            'respuesta_id' => Respuesta::factory()
+            'examen_id' => 1,
+            'pregunta_id' => $this->faker->numberBetween(1, 20),
+            'orden' => $this->faker->numberBetween(1, 10)
         ];
     }
 }

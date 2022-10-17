@@ -17,7 +17,7 @@ class RespuestaFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'descripcion' => $this->faker->sentence(2)
         ];
     }
 }

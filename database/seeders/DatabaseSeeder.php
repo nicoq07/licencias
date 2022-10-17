@@ -22,7 +22,12 @@ class DatabaseSeeder extends Seeder
             RolSeeder::class,
             SexoSeeder::class,
             TipoDocumentoSeeder::class,
-            PersonaSeeder::class
+            PersonaSeeder::class,
+            PreguntaSeeder::class,
+            UsuarioSeeder::class,
+            ExamenSeeder::class,
+            ExamenPreguntaSeeder::class,
+
         ]);
     }
 }

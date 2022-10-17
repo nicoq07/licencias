@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\UsuarioController;
+use App\Models\Examen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,5 +26,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/home', [UsuarioController::class, 'home']);
 
 Route::prefix('usuarios')->group(function () {
-    Route::post('/login', [UsuarioController::class, 'login']);
+    Route::post('/login', [UsuarioController::class, 'doLogin']);
+});
+
+
+Route::prefix('examenes')->group(function () {
+    // Route::get('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
+    Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
 });

@@ -21,7 +21,7 @@ class ExamenPreguntaFactory extends Factory
             //
             'examen_id' => 1,
             'pregunta_id' => $this->faker->numberBetween(1, 20),
-            'orden' => $this->faker->numberBetween(1, 10)
+            'resultado_al_responder' => $this->faker->boolean(80)
         ];
     }
 }

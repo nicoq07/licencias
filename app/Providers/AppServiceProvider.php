@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Arr;
+use Auth;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,5 +26,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        // $this->register();
+        Auth::provider('custom', function ($app, array $config) {
+            return new ApiUserProvider();
+        });
     }
 }

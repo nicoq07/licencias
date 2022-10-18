@@ -33,6 +33,6 @@ Route::prefix('usuarios')->group(function () {
 Route::prefix('examenes')->group(function () {
     // Route::get('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
     Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
-    Route::post('/examen/', [ExamenController::class, 'doCuestionario']);
-    Route::get('/{numero_pregunta}/{token}', [ExamenController::class, 'show']);
+    Route::post('/examen', [ExamenController::class, 'doCuestionario']);
+    Route::get('/examen/{numero_pregunta}/{token}', [ExamenController::class, 'show']);
 });

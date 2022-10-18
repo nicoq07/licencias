@@ -62,23 +62,44 @@ class ExamenController extends Controller
             return response([$error->getMessage(), $error->getTraceAsString()], 500);
         }
     }
-
-
-
-
     /**
      * muestra el resultado del examen
      */
     public function show(Request $request, $orden, $token, ExamenService $examenService)
     {
-        $examenService->obtenerPreguntaPorTokenOrden($token, $orden);
+        $pregunta = $examenService->obtenerPreguntaPorTokenOrden($token, $orden);
+        return response(
+            ['pregunta' => $pregunta->descripcion],
+            200
+        );
     }
 
     /**
      * recibe la respuesta de la pregunta 
      */
-    public function doCuestionario(Request $request)
+    public function doCuestionario(Request $request, ExamenService $examenService)
     {
-        # code...
+        $validator = Validator::make($request->all(), [
+            'respuesta_id' => 'bail|required',
+            'token' => 'required',
+            'numero_pregunta' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response(
+                [
+                    'errors' => $validator->errors(),
+                    'status' => Response::HTTP_BAD_REQUEST
+                ]
+            );
+        }
+        $token = $request->get('token');
+        $respuesta_id = $request->get('respuesta_id');
+        $numero_pregunta = $request->get('numero_pregunta');
+
+        $pregunta = $examenService->responderPreguntaPorTokenOrden($token, $numero_pregunta, $respuesta_id);
+        return response(
+            ['pregunta' => $pregunta->descripcion],
+            200
+        );
     }
 }

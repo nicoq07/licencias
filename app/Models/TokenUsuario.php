@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $usuario_id
  * @property string $token
  * @property string|null $last_used_at
- * @property string|null $expires_at
+ * @property \Illuminate\Support\Carbon $expires_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Database\Factories\TokenUsuarioFactory factory(...$parameters)
@@ -32,4 +33,11 @@ class TokenUsuario extends Model
 {
     protected $table = 'tokens_usuarios';
     use HasFactory;
+
+    // protected function expiresAt(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn ($value) => date('d/m/Y H:i', strtotime($value))
+    //     );
+    // }
 }

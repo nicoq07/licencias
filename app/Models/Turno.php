@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property int $usuario_id
- * @property string $fecha
+ * @property \Illuminate\Support\Carbon
  * @property int $asistio
  * @property int $activo
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -32,9 +34,21 @@ use Illuminate\Database\Eloquent\Model;
 class Turno extends Model
 {
     use HasFactory;
+    protected $fillable = ['usuario_id', 'fecha', 'asistio', 'activo'];
+    // protected $casts = [
+    //     'fecha' => 'datetime:Y-m-d H:i',
+    // ];
 
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id');
+    }
+
+
+    protected function fecha(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => date('d/m/Y H:i', strtotime($value))
+        );
     }
 }

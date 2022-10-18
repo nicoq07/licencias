@@ -15,10 +15,10 @@ return new class extends Migration
     {
         Schema::create('examenes', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('fecha');
+            $table->dateTime('fecha')->nullable(true);
             $table->unsignedBigInteger('usuario_id');
-            $table->smallInteger('nota');
-            $table->smallInteger('intento')->comment('numero de intento');
+            $table->smallInteger('nota')->nullable(true);
+            $table->smallInteger('intento')->nullable(true)->comment('numero de intento');
             $table->boolean('activo');
             $table->timestamps();
 

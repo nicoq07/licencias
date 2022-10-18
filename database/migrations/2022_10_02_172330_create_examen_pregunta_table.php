@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('pregunta_id');
             $table->unsignedBigInteger('examen_id');
-            $table->smallInteger('resultado_al_responder');
+            $table->smallInteger('resultado_al_responder')->nullable();
             $table->timestamps();
 
             $table->unique(['id', 'pregunta_id', 'examen_id']);

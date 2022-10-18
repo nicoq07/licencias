@@ -42,6 +42,15 @@ class Examen extends Model
     {
         return $this->belongsToMany(Pregunta::class);
     }
+
+    public function preguntaPorNumero($numero_pregunta)
+    {
+        return $this->belongsToMany(Pregunta::class)
+            ->withPivot(['orden'])
+            ->wherePivot('orden', '=', $numero_pregunta)
+            ->first();
+    }
+
     public function usuario()
     {
         return $this->belongsTo(Usuario::class);

@@ -27,12 +27,15 @@ Route::get('/home', [UsuarioController::class, 'home']);
 
 Route::prefix('usuarios')->group(function () {
     Route::post('/login', [UsuarioController::class, 'doLogin']);
+    Route::get('/', [UsuarioController::class, 'index']);
 });
 
+Route::get('/examen/test', [ExamenController::class, 'index']);
 
 Route::prefix('examenes')->group(function () {
     // Route::get('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
     Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
     Route::post('/examen', [ExamenController::class, 'doCuestionario']);
     Route::get('/examen/{numero_pregunta}/{token}', [ExamenController::class, 'show']);
+    
 });

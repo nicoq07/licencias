@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Examen;
 use App\Models\Pregunta;
 use App\Models\PreguntaExamen;
+use App\Models\Respuesta;
 use Carbon\Carbon;
 
 class ExamenService
@@ -42,9 +43,16 @@ class ExamenService
         $usuario = $this->tokenUsuarioService->obtenerUsuarioPorToken($token);
         $examen = Examen::whereActivo(true)->whereUsuarioId($usuario->id)->latest('intento')->get()->first();
         $pregunta = $examen->preguntaPorNumero($numero_pregunta);
+        $respuestaCorrecta = Respuesta::whereId($pregunta->respuesta_id)->first();
+        $respuestas = null;
+        foreach (Respuesta::where('id', '<>', $pregunta->respuesta_id)->inRandomOrder()->limit(3)->get() as $r) {
+            $respuestas[$r->id] = [$r->id => $r->descripcion];
+        }
+        $respuestas[$respuestaCorrecta->id] = [$respuestaCorrecta->id => $respuestaCorrecta->descripcion];
+        shuffle($respuestas);
         $examen->updated_at = Carbon::now()->toDateTimeString();
         $examen->save();
-        return $pregunta;
+        return ['pregunta' => $pregunta->descripcion, 'opciones' => $respuestas];
     }
 
     public function responderPreguntaPorTokenOrden($token, $numero_pregunta, $respuesta_id)
@@ -60,5 +68,18 @@ class ExamenService
         $examen->preguntas()->updateExistingPivot($pregunta->id, ['resultado_al_responder' => $respuestaOk, 'updated_at' => Carbon::now()->toDateTimeString()]);
         $examen->save();
         return $pregunta;
+    }
+
+    public function generarUrlProximoPaso($token, $preguntalActual)
+    {
+        $url = null;
+        if ($preguntalActual == 10) {
+            $url = ['resultado' => url("api/examen/$token/resultado")];
+        } else {
+            $siguiente = intval($preguntalActual) + 1;
+            $url = ['siguientePregunta' => url("api/examen/$token/$siguiente")];
+        }
+
+        return $url;
     }
 }

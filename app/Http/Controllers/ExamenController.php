@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Traits\AuthorizationTrait;
 use App\Services\ExamenService;
 use App\Services\PersonaService;
 use App\Services\UsuarioService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,10 +14,10 @@ use Validator;
 
 class ExamenController extends Controller
 {
-    
+
     use AuthorizationTrait;
 
-    
+
     public function cuestionarioInicial(
         Request $request,
         UsuarioService $usuarioService,
@@ -31,10 +33,11 @@ class ExamenController extends Controller
                 [
                     'errors' => $validator->errors(),
                     'status' => Response::HTTP_BAD_REQUEST
-                ],Response::HTTP_BAD_REQUEST
+                ],
+                Response::HTTP_BAD_REQUEST
             );
         }
-        
+
         try {
             $documento = $request->post('documento');
             $tipo_documento_id = $request->post('tipo_documento_id');
@@ -58,7 +61,7 @@ class ExamenController extends Controller
                 return response([
                     'mensaje' => 'Puede iniciar el examen, conserve el siguiente token (1 hora de validez) :',
                     'token' => $token->token,
-                    'expira' => $token->expires_at
+                    'expira' => Carbon::createFromFormat('Y-m-d H:i:s', $token->expires_at)->format("d/m/Y H:i")
                 ]);
             }
         } catch (Exception $error) {
@@ -68,12 +71,21 @@ class ExamenController extends Controller
     /**
      * muestra el resultado del examen
      */
-    public function show(Request $request, $orden, $token, ExamenService $examenService)
+    public function show($token, $orden, ExamenService $examenService)
     {
-        $pregunta = $examenService->obtenerPreguntaPorTokenOrden($token, $orden);
+        $response = null;
+        $code = 200;
+        if (!$this->validToken($token)) {
+            $response = ['mensaje' => "Token inválido."];
+            $code = 401;
+        } else {
+
+            $response =    $examenService->obtenerPreguntaPorTokenOrden($token, $orden);
+        }
+
         return response(
-            ['pregunta' => $pregunta->descripcion],
-            200
+            $response,
+            $code
         );
     }
 
@@ -95,19 +107,24 @@ class ExamenController extends Controller
                 ]
             );
         }
-        $token = $request->get('token');
-        $respuesta_id = $request->get('respuesta_id');
-        $numero_pregunta = $request->get('numero_pregunta');
+        $token = $request->post('token');
+        $respuesta_id = $request->post('respuesta_id');
+        $numero_pregunta = $request->post('numero_pregunta');
+        $response = [];
+        $code = 200;
+        if (!$this->validToken($token)) {
+            $response = ['mensaje' => "Token inválido."];
+            $code = 401;
+        } else {
 
-        $pregunta = $examenService->responderPreguntaPorTokenOrden($token, $numero_pregunta, $respuesta_id);
-
-
+            $pregunta = $examenService->responderPreguntaPorTokenOrden($token, $numero_pregunta, $respuesta_id);
+            $proximoPaso = $examenService->generarUrlProximoPaso($token,  $numero_pregunta);
+            array_push($response, ["mensaje" => "Pregunta $numero_pregunta respondida!"]);
+            array_push($response, $proximoPaso);
+        }
         return response(
-            [
-                'pregunta' => $pregunta->descripcion,
-                'siguiente_pregunta' => ($pregunta->orden + 1)
-            ],
-            200
+            $response,
+            $code
         );
     }
 }

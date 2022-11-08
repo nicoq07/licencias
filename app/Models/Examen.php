@@ -43,7 +43,7 @@ class Examen extends Model
         return $this->belongsToMany(Pregunta::class);
     }
 
-    public function preguntaPorNumero($numero_pregunta)
+    public function preguntaPorNumero($numero_pregunta): Pregunta
     {
         return $this->belongsToMany(Pregunta::class)
             ->withPivot(['orden'])

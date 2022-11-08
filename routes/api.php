@@ -30,12 +30,21 @@ Route::prefix('usuarios')->group(function () {
     Route::get('/', [UsuarioController::class, 'index']);
 });
 
-Route::get('/examen/test', [ExamenController::class, 'index']);
+
+
+Route::prefix('examen')->group(function () {
+    // Route::get('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
+    Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
+    Route::post('/do', [ExamenController::class, 'doCuestionario']);
+    Route::get('/{token}/{numero_pregunta}', [ExamenController::class, 'show']);
+    Route::get('/{token}/resultado', [ExamenController::class, 'show']);
+    Route::get('/test', [ExamenController::class, 'index']);
+});
 
 Route::prefix('examenes')->group(function () {
     // Route::get('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
-    Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
-    Route::post('/examen', [ExamenController::class, 'doCuestionario']);
-    Route::get('/examen/{numero_pregunta}/{token}', [ExamenController::class, 'show']);
-    
+    // Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
+    // Route::post('/examen', [ExamenController::class, 'doCuestionario']);
+    // Route::get('/examen/{numero_pregunta}/{token}', [ExamenController::class, 'show']);
+    // Route::get('/examen/resultado', [ExamenController::class, 'show']);
 });

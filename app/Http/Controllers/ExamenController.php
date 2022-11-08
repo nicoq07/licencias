@@ -17,7 +17,6 @@ class ExamenController extends Controller
     public function cuestionarioInicial(
         Request $request,
         UsuarioService $usuarioService,
-        ExamenService $examenService,
         PersonaService $personaService
     ) {
         $validator = Validator::make($request->all(), [
@@ -97,8 +96,13 @@ class ExamenController extends Controller
         $numero_pregunta = $request->get('numero_pregunta');
 
         $pregunta = $examenService->responderPreguntaPorTokenOrden($token, $numero_pregunta, $respuesta_id);
+
+
         return response(
-            ['pregunta' => $pregunta->descripcion],
+            [
+                'pregunta' => $pregunta->descripcion,
+                'siguiente_pregunta' => ($pregunta->orden + 1)
+            ],
             200
         );
     }

@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|ExamenPregunta whereResultadoAlResponder($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ExamenPregunta whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property int|null $orden
+ * @method static \Illuminate\Database\Eloquent\Builder|ExamenPregunta whereOrden($value)
  */
 class ExamenPregunta extends Model
 {

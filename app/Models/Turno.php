@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Turno whereUsuarioId($value)
  * @mixin \Eloquent
  * @property-read \App\Models\Usuario $usuario
+ * @property string $fecha
  */
 class Turno extends Model
 {

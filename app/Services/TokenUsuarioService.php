@@ -71,9 +71,17 @@ class TokenUsuarioService
 
     public function destruirToken($usuario_id, $token = null)
     {
-        $tokenUsuario = TokenUsuario::whereUsuarioId($usuario_id)
-            ->whereToken($token)
-            ->orWhere('expires_at', '<=', Carbon::now())->get()->first();
-        $tokenUsuario->delete();
+        $tokenUsuario = TokenUsuario::whereUsuarioId($usuario_id);
+       
+        if($token)
+        {
+            $tokenUsuario =  $tokenUsuario->whereToken($token)->orWhere('expires_at', '>=', Carbon::now())->get()->first()->delete();
+        }
+        else{
+            $tokenUsuario = $tokenUsuario->get()->first();
+            if($tokenUsuario) $tokenUsuario->delete();
+        }       
+        return true;     
+          
     }
 }

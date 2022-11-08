@@ -22,6 +22,14 @@ class UsuarioController extends Controller
         return response($msj, 200);
     }
 
+    public function index()
+    {
+        $usuarios = Usuario::with("Persona")->get()->toJson();
+        
+        return response($usuarios, 200);
+    }
+
+
     // public function doLogin(Request $request)
     // {
 

@@ -27,4 +27,9 @@ class TurnoService
             return $turno;
         }
     }
+
+    public function borrarTurno($turno)
+    {
+        return $turno->delete(); 
+    }
 }

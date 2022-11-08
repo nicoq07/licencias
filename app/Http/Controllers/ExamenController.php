@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Traits\AuthorizationTrait;
 use App\Services\ExamenService;
 use App\Services\PersonaService;
 use App\Services\UsuarioService;
@@ -12,14 +12,16 @@ use Validator;
 
 class ExamenController extends Controller
 {
-    //
+    
+    use AuthorizationTrait;
 
+    
     public function cuestionarioInicial(
         Request $request,
         UsuarioService $usuarioService,
         PersonaService $personaService
     ) {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->post(), [
             'tipo_documento_id' => 'bail|required',
             'documento' => 'required|numeric',
             'utiliza_anteojos' => 'required'
@@ -29,19 +31,21 @@ class ExamenController extends Controller
                 [
                     'errors' => $validator->errors(),
                     'status' => Response::HTTP_BAD_REQUEST
-                ]
+                ],Response::HTTP_BAD_REQUEST
             );
         }
+        
         try {
-            $documento = $request->get('documento');
-            $tipo_documento_id = $request->get('tipo_documento_id');
-            $utiliza_anteojos = $request->get('utiliza_anteojos');
+            $documento = $request->post('documento');
+            $tipo_documento_id = $request->post('tipo_documento_id');
+            $utiliza_anteojos = $request->post('utiliza_anteojos');
             $persona = $personaService->obtenerPersonaPorDocummentoTipoDocumento(documento: $documento, tipo_documento_id: $tipo_documento_id);
             $usuario = $usuarioService->obtenerUsuarioPorPersonaId(persona_id: $persona->id);
             //ver si utiliza anteojos y actualizar en la clasePersona
             //Si utiliza generar un turno para una revision
 
-            if ($request->get('utiliza_anteojos')) {
+            if ($request->post('utiliza_anteojos')) {
+                $usuarioService->borrarTokenUsuario($usuario->id, null);
                 $persona = $personaService->actualizarUtilizaAnteojos(persona_id: $persona->id, utiliza_anteojos: $utiliza_anteojos);
                 $turno = $usuarioService->generarTurno($usuario->id);
                 return response([

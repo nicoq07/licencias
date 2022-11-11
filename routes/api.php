@@ -36,9 +36,8 @@ Route::prefix('examen')->group(function () {
     // Route::get('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
     Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
     Route::post('/do', [ExamenController::class, 'doCuestionario']);
-    Route::get('/{token}/{numero_pregunta}', [ExamenController::class, 'show']);
-    Route::get('/{token}/resultado', [ExamenController::class, 'show']);
-    Route::get('/test', [ExamenController::class, 'index']);
+    Route::get('/pregunta/', [ExamenController::class, 'pregunta']);
+    Route::get('/resultado/', [ExamenController::class, 'resultado']);
 });
 
 Route::prefix('examenes')->group(function () {

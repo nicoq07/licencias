@@ -71,10 +71,12 @@ class ExamenController extends Controller
     /**
      * muestra el resultado del examen
      */
-    public function show($token, $orden, ExamenService $examenService)
+    public function pregunta(Request $request, ExamenService $examenService)
     {
         $response = null;
         $code = 200;
+        $token = $request->get('token');
+        $orden = $request->get('numero_pregunta');
         if (!$this->validToken($token)) {
             $response = ['mensaje' => "Token inválido."];
             $code = 401;
@@ -125,6 +127,28 @@ class ExamenController extends Controller
         return response(
             $response,
             $code
+        );
+    }
+
+    public function resultado(Request $request, ExamenService $examenService)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+        ]);
+        $token = $request->get('token');
+        if ($validator->fails()) {
+            return response(
+                [
+                    'errors' => $validator->errors(),
+                    'status' => Response::HTTP_BAD_REQUEST
+                ]
+            );
+        }
+
+        $examen = $examenService->obtenerExamenFinalizado($token);
+        return response(
+            ['mensaje' => "Exámen finalizado, nota: $examen->nota"],
+            200
         );
     }
 }

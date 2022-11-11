@@ -8,6 +8,8 @@ use App\Models\PreguntaExamen;
 use App\Models\Respuesta;
 use Carbon\Carbon;
 
+use function Psy\debug;
+
 class ExamenService
 {
     private $tokenUsuarioService;
@@ -23,6 +25,7 @@ class ExamenService
         $examen = new Examen();
         $examen->usuario_id = $usuario_id;
         $examen->activo = true;
+        $examen->intento = true;
         $examen->save();
 
         $i = 1;
@@ -74,12 +77,42 @@ class ExamenService
     {
         $url = null;
         if ($preguntalActual == 10) {
-            $url = ['resultado' => url("api/examen/$token/resultado")];
+            $this->generarResultado($token);
+            $url = ['resultado' => url("api/examen/resultado/$token")];
         } else {
             $siguiente = intval($preguntalActual) + 1;
             $url = ['siguientePregunta' => url("api/examen/$token/$siguiente")];
         }
 
+
+
         return $url;
+    }
+
+    public function obtenerExamenFinalizado($token)
+    {
+        $usuario = $this->tokenUsuarioService->obtenerUsuarioPorToken($token);
+        $examen = Examen::whereActivo(false)
+            ->whereUsuarioId($usuario->id)
+            ->where('nota', '<>', null)
+            ->latest('intento')
+            ->get()
+            ->first();
+        dd($examen);
+        return $examen;
+    }
+
+    public function generarResultado($token)
+    {
+        $usuario = $this->tokenUsuarioService->obtenerUsuarioPorToken($token);
+        $examen = Examen::whereActivo(true)->whereUsuarioId($usuario->id)->latest('intento')->get()->first();
+        $nota = 0;
+        foreach ($examen->preguntas()->get() as $pregunta) {
+            $nota += ($pregunta->pivot->resultado_al_responder == 1) ? 1 : 0;
+        }
+        $nota = $nota / 10;
+        $examen->nota = $nota;
+        $examen->activo = 0;
+        $examen->save();
     }
 }

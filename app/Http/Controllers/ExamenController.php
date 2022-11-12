@@ -160,4 +160,10 @@ class ExamenController extends Controller
             200
         );
     }
+
+    //TODO: armar el reporte de aprobados, desaprobados 
+    public function reporte(Request $request)
+    {
+        # code...
+    }
 }

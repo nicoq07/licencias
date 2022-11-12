@@ -1,9 +1,8 @@
 <?php
 
 use App\Http\Controllers\ExamenController;
+use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\UsuarioController;
-use App\Models\Examen;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,10 +39,9 @@ Route::prefix('examen')->group(function () {
     Route::get('/resultado/', [ExamenController::class, 'resultado']);
 });
 
-Route::prefix('examenes')->group(function () {
-    // Route::get('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
-    // Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
-    // Route::post('/examen', [ExamenController::class, 'doCuestionario']);
-    // Route::get('/examen/{numero_pregunta}/{token}', [ExamenController::class, 'show']);
-    // Route::get('/examen/resultado', [ExamenController::class, 'show']);
+Route::prefix('pregunta')->group(function () {
+
+    Route::post('/', [PreguntaController::class, 'store']);
+    Route::post('/edit', [PreguntaController::class, 'edit']);
 });
+Route::get('preguntas', [PreguntaController::class, 'index']);

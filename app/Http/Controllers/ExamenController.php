@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Traits\AuthorizationTrait;
+use App\Traits\AuthorizationTokenTrait;
 use App\Services\ExamenService;
 use App\Services\PersonaService;
 use App\Services\UsuarioService;
@@ -15,7 +15,7 @@ use Validator;
 class ExamenController extends Controller
 {
 
-    use AuthorizationTrait;
+    use AuthorizationTokenTrait;
 
 
     public function cuestionarioInicial(
@@ -57,6 +57,7 @@ class ExamenController extends Controller
                     'Numero de turno' => $turno->id
                 ], 201);
             } else {
+
                 $token = $usuarioService->generarTokenUsuario(usuario_id: $usuario->id);
                 return response([
                     'mensaje' => 'Puede iniciar el examen, conserve el siguiente token (1 hora de validez) :',
@@ -119,10 +120,18 @@ class ExamenController extends Controller
             $code = 401;
         } else {
 
-            $pregunta = $examenService->responderPreguntaPorTokenOrden($token, $numero_pregunta, $respuesta_id);
-            $proximoPaso = $examenService->generarUrlProximoPaso($token,  $numero_pregunta);
-            array_push($response, ["mensaje" => "Pregunta $numero_pregunta respondida!"]);
-            array_push($response, $proximoPaso);
+            if ($examenService->responderPreguntaPorTokenOrden($token, $numero_pregunta, $respuesta_id)) {
+
+                $proximoPaso = $examenService->generarUrlProximoPaso($token,  $numero_pregunta);
+                array_push($response, ["mensaje" => "Pregunta $numero_pregunta respondida!"]);
+                array_push($response, $proximoPaso);
+            } else {
+                $response = [
+                    'mensaje' => "Ya no puede responder a este exámen.",
+                    "Vea su resultado en:" => url("api/examen/resultado/?token=$token")
+                ];
+                $code = 404;
+            }
         }
         return response(
             $response,
@@ -133,9 +142,9 @@ class ExamenController extends Controller
     public function resultado(Request $request, ExamenService $examenService)
     {
         $validator = Validator::make($request->all(), [
-            'token' => 'required',
+            'id' => 'required',
         ]);
-        $token = $request->get('token');
+        $id = $request->get('id');
         if ($validator->fails()) {
             return response(
                 [
@@ -145,9 +154,9 @@ class ExamenController extends Controller
             );
         }
 
-        $examen = $examenService->obtenerExamenFinalizado($token);
+        $resultado = $examenService->obtenerExamenFinalizado($id);
         return response(
-            ['mensaje' => "Exámen finalizado, nota: $examen->nota"],
+            $resultado,
             200
         );
     }

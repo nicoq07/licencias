@@ -22,15 +22,10 @@ class UsuarioService
         $token = (new TokenUsuarioService())->obtenerOCearTokenParaExamen($usuario_id);
         return $token;
     }
-    public function borrarTokenUsuario($usuario_id, $token=null)
+    public function borrarTokenUsuario($usuario_id, $token = null)
     {
         $r = (new TokenUsuarioService())->destruirToken($usuario_id, $token);
         return $r;
-    }
-    public function generarTokenUsuarioAdmin($usuario_id)
-    {
-        // $token = (new TokenUsuarioService())->obtenerOCearTokenParaExamen($usuario_id);
-        // return $token;
     }
 
     public function generarTurno($usuario_id)
@@ -42,8 +37,7 @@ class UsuarioService
     {
         $turnoService = new TurnoService();
         $turno = Turno::whereUsuarioId($usuario_id)->get()->first();
-        if($turno)
-        {
+        if ($turno) {
             return $turnoService->borrarTurno($turno);
         }
     }

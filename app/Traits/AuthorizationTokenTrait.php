@@ -3,13 +3,9 @@
 namespace App\Traits;
 
 use App\Models\TokenUsuario;
-use App\Models\Usuario;
 use Carbon\Carbon;
-use Request;
 
-use function PHPUnit\Framework\isNull;
-
-trait AuthorizationTrait
+trait AuthorizationTokenTrait
 {
 
     public function validToken($token)

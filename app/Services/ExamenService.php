@@ -6,9 +6,9 @@ use App\Models\Examen;
 use App\Models\Pregunta;
 use App\Models\PreguntaExamen;
 use App\Models\Respuesta;
+use App\Models\TokenUsuario;
 use Carbon\Carbon;
-
-use function Psy\debug;
+use Exception;
 
 class ExamenService
 {
@@ -22,10 +22,12 @@ class ExamenService
 
     public function iniciarExamen($usuario_id)
     {
+        $intento = $this->obtenerUltimoIntento($usuario_id);
+        if ($intento >= 3) throw new Exception("Ya no posee intentos de Exámen.");
         $examen = new Examen();
         $examen->usuario_id = $usuario_id;
         $examen->activo = true;
-        $examen->intento = true;
+        $examen->intento = $intento;
         $examen->save();
 
         $i = 1;
@@ -50,8 +52,8 @@ class ExamenService
         $respuestas = null;
         foreach (Respuesta::where('id', '<>', $pregunta->respuesta_id)->inRandomOrder()->limit(3)->get() as $r) {
             $respuestas[$r->id] = [$r->id => $r->descripcion];
+            $respuestas[$respuestaCorrecta->id] = [$respuestaCorrecta->id => $respuestaCorrecta->descripcion];
         }
-        $respuestas[$respuestaCorrecta->id] = [$respuestaCorrecta->id => $respuestaCorrecta->descripcion];
         shuffle($respuestas);
         $examen->updated_at = Carbon::now()->toDateTimeString();
         $examen->save();
@@ -62,44 +64,59 @@ class ExamenService
     {
         $usuario = $this->tokenUsuarioService->obtenerUsuarioPorToken($token);
         $examen = Examen::whereActivo(true)->whereUsuarioId($usuario->id)->latest('intento')->get()->first();
-        $examen->updated_at = Carbon::now()->toDateTimeString();
-        $pregunta = $examen->preguntaPorNumero($numero_pregunta);
-        $respuestaOk = true;
-        if ($pregunta->respuesta_id != $respuesta_id) {
-            $respuestaOk = false;
+        if ($examen) {
+            $examen->updated_at = Carbon::now()->toDateTimeString();
+            $pregunta = $examen->preguntaPorNumero($numero_pregunta);
+            $respuestaOk = true;
+            if ($pregunta->respuesta_id != $respuesta_id) {
+                $respuestaOk = false;
+            }
+            $examen->preguntas()->updateExistingPivot($pregunta->id, ['resultado_al_responder' => $respuestaOk, 'updated_at' => Carbon::now()->toDateTimeString()]);
+            $examen->save();
+            return $pregunta;
+        } else {
+            return false;
         }
-        $examen->preguntas()->updateExistingPivot($pregunta->id, ['resultado_al_responder' => $respuestaOk, 'updated_at' => Carbon::now()->toDateTimeString()]);
-        $examen->save();
-        return $pregunta;
     }
 
     public function generarUrlProximoPaso($token, $preguntalActual)
     {
         $url = null;
         if ($preguntalActual == 10) {
-            $this->generarResultado($token);
-            $url = ['resultado' => url("api/examen/resultado/$token")];
+            $id = $this->generarResultado($token);
+            $url = ['resultado' => url("api/examen/resultado/?id=$id")];
         } else {
             $siguiente = intval($preguntalActual) + 1;
-            $url = ['siguientePregunta' => url("api/examen/$token/$siguiente")];
+            $url = ['siguientePregunta' => url("api/examen/?token=$token&numero_pregunta=$siguiente")];
         }
-
-
 
         return $url;
     }
 
-    public function obtenerExamenFinalizado($token)
+    public function obtenerExamenFinalizado($id)
     {
-        $usuario = $this->tokenUsuarioService->obtenerUsuarioPorToken($token);
         $examen = Examen::whereActivo(false)
-            ->whereUsuarioId($usuario->id)
+            ->whereId($id)
             ->where('nota', '<>', null)
             ->latest('intento')
             ->get()
             ->first();
-        dd($examen);
-        return $examen;
+
+        if ($examen->nota >= 8) {
+            return [
+                'mensaje'  => 'Exámen aprobado, su nota es: ' . $examen->nota
+            ];
+        } else {
+            if ($this->obtenerUltimoIntento($examen->usuario_id) < 3) {
+                return [
+                    'mensaje'  => 'Exámen desaprobado, puede reintentar hacer un nuevo exámen.'
+                ];
+            } else {
+                return [
+                    'mensaje'  => 'Exámen desaprobado, no tiene mas intentos para realizarlo.'
+                ];
+            }
+        }
     }
 
     public function generarResultado($token)
@@ -110,9 +127,22 @@ class ExamenService
         foreach ($examen->preguntas()->get() as $pregunta) {
             $nota += ($pregunta->pivot->resultado_al_responder == 1) ? 1 : 0;
         }
-        $nota = $nota / 10;
         $examen->nota = $nota;
-        $examen->activo = 0;
+        $examen->activo = false;
+        $examen->fecha = Carbon::now()->toDateTimeString();
         $examen->save();
+
+        TokenUsuario::whereToken($token)->get()->first()->delete();
+
+        return $examen->id;
+    }
+
+    private function obtenerUltimoIntento($usuario_id): int
+    {
+        if ($examen = Examen::whereUsuarioId($usuario_id)->get()->first()) {
+            return $examen->intento + 1;
+        } else {
+            return 1;
+        }
     }
 }

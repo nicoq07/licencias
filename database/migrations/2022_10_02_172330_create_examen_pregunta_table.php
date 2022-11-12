@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['id', 'pregunta_id', 'examen_id']);
-            $table->foreign('examen_id')->references('id')->on('examenes');
+            $table->foreign('examen_id')->references('id')->on('examenes')->onDelete('cascade');
             $table->foreign('pregunta_id')->references('id')->on('preguntas');
         });
     }

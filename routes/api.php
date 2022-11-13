@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExamenController;
+use App\Http\Controllers\LicenciaController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
@@ -32,11 +33,13 @@ Route::prefix('usuarios')->group(function () {
 
 
 Route::prefix('examen')->group(function () {
-    // Route::get('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
+
+    Route::get('/pregunta/{token}/{orden}', [ExamenController::class, 'pregunta']);
+    Route::get('/resultado/{examen}', [ExamenController::class, 'resultado']);
+
+
     Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
     Route::post('/do', [ExamenController::class, 'doCuestionario']);
-    Route::get('/pregunta/', [ExamenController::class, 'pregunta']);
-    Route::get('/resultado/', [ExamenController::class, 'resultado']);
 });
 
 Route::prefix('pregunta')->group(function () {
@@ -45,3 +48,6 @@ Route::prefix('pregunta')->group(function () {
     Route::post('/edit', [PreguntaController::class, 'edit']);
 });
 Route::get('preguntas', [PreguntaController::class, 'index']);
+
+
+Route::get('/licencias/{usuarioId}/{licenciaId}', [LicenciaController::class, 'show']);

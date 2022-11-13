@@ -24,8 +24,8 @@ class UsuarioController extends Controller
 
     public function index()
     {
-        $usuarios = Usuario::with("Persona")->get()->toJson();
-        
+        $usuarios = Usuario::with("Persona")->get();
+
         return response($usuarios, 200);
     }
 

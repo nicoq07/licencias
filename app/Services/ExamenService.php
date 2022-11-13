@@ -9,6 +9,7 @@ use App\Models\Respuesta;
 use App\Models\TokenUsuario;
 use Carbon\Carbon;
 use Exception;
+use PhpParser\Node\Expr\Throw_;
 
 class ExamenService
 {
@@ -83,8 +84,7 @@ class ExamenService
     {
         $url = null;
         if ($preguntalActual == 10) {
-            $id = $this->generarResultado($token);
-            $url = ['resultado' => url("api/examen/resultado/?id=$id")];
+            $url = $this->generarResultado($token);
         } else {
             $siguiente = intval($preguntalActual) + 1;
             $url = ['siguientePregunta' => url("api/examen/?token=$token&numero_pregunta=$siguiente")];
@@ -101,7 +101,9 @@ class ExamenService
             ->latest('intento')
             ->get()
             ->first();
-
+        if (!$examen) {
+            throw new Exception("No puede acceder a ese examen.");
+        }
         if ($examen->nota >= 8) {
             return [
                 'mensaje'  => 'Exámen aprobado, su nota es: ' . $examen->nota
@@ -109,7 +111,7 @@ class ExamenService
         } else {
             if ($this->obtenerUltimoIntento($examen->usuario_id) < 3) {
                 return [
-                    'mensaje'  => 'Exámen desaprobado, puede reintentar hacer un nuevo exámen.'
+                    'mensaje'  => 'Exámen desaprobado, puede hacer un nuevo exámen.'
                 ];
             } else {
                 return [
@@ -134,12 +136,21 @@ class ExamenService
 
         TokenUsuario::whereToken($token)->get()->first()->delete();
 
-        return $examen->id;
+        if ($examen->nota >= 8) {
+            $lS = new LicenciaService();
+            $licencia = $lS->generarLicencia($usuario->id, $examen->id);
+            return [
+                'mensaje'  => 'Examen aprobad, su nota es : ' . $examen->nota . '\n Puede visualizar su licencia aquí:',
+                'url'  => url("licencias/" . $usuario->id . "/" . $licencia->id)
+            ];
+        } else {
+            return $this->obtenerExamenFinalizado($examen->id);
+        }
     }
 
-    private function obtenerUltimoIntento($usuario_id): int
+    public function obtenerUltimoIntento($usuario_id): int
     {
-        if ($examen = Examen::whereUsuarioId($usuario_id)->get()->first()) {
+        if ($examen = Examen::whereUsuarioId($usuario_id)->latest('intento')->get()->first()) {
             return $examen->intento + 1;
         } else {
             return 1;

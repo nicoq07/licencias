@@ -72,12 +72,11 @@ class ExamenController extends Controller
     /**
      * muestra el resultado del examen
      */
-    public function pregunta(Request $request, ExamenService $examenService)
+    public function pregunta($token, $orden, ExamenService $examenService)
     {
         $response = null;
         $code = 200;
-        $token = $request->get('token');
-        $orden = $request->get('numero_pregunta');
+
         if (!$this->validToken($token)) {
             $response = ['mensaje' => "Token inválido."];
             $code = 401;
@@ -139,26 +138,21 @@ class ExamenController extends Controller
         );
     }
 
-    public function resultado(Request $request, ExamenService $examenService)
+    public function resultado($id, ExamenService $examenService)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required',
-        ]);
-        $id = $request->get('id');
-        if ($validator->fails()) {
+        $resultado = "";
+        $code = 200;
+        try {
+            $resultado = $examenService->obtenerExamenFinalizado($id);
+        } catch (Exception $e) {
+            $resultado = ['mensaje'  => $e->getMessage()];
+            $code = 404;
+        } finally {
             return response(
-                [
-                    'errors' => $validator->errors(),
-                    'status' => Response::HTTP_BAD_REQUEST
-                ]
+                $resultado,
+                $code
             );
         }
-
-        $resultado = $examenService->obtenerExamenFinalizado($id);
-        return response(
-            $resultado,
-            200
-        );
     }
 
     //TODO: armar el reporte de aprobados, desaprobados 

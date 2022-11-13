@@ -13,13 +13,9 @@ class UsuarioService
 {
 
 
-    /**
-     * TODO: cuando genera lo hace en UTC, y te muestra la hora en UTC
-     * cuando muestra despues de la primera vez lo hace en UTC-3
-     */
-    public function generarTokenUsuario($usuario_id)
+    public function generarTokenUsuario($usuario_id, PreguntaService $preguntaService)
     {
-        $token = (new TokenUsuarioService())->obtenerOCearTokenParaExamen($usuario_id);
+        $token = (new TokenUsuarioService())->obtenerOCearTokenParaExamen($usuario_id, $preguntaService);
         return $token;
     }
     public function borrarTokenUsuario($usuario_id, $token = null)

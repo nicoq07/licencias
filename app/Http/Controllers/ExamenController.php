@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Traits\AuthorizationTokenTrait;
 use App\Services\ExamenService;
 use App\Services\PersonaService;
+use App\Services\PreguntaService;
 use App\Services\UsuarioService;
+use App\Traits\AuthorizationAdminTrait;
 use Carbon\Carbon;
+use Database\Seeders\PreguntaSeeder;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,12 +19,13 @@ class ExamenController extends Controller
 {
 
     use AuthorizationTokenTrait;
-
+    use AuthorizationAdminTrait;
 
     public function cuestionarioInicial(
         Request $request,
         UsuarioService $usuarioService,
-        PersonaService $personaService
+        PersonaService $personaService,
+        PreguntaService  $preguntaService
     ) {
         $validator = Validator::make($request->post(), [
             'tipo_documento_id' => 'bail|required',
@@ -31,7 +35,7 @@ class ExamenController extends Controller
         if ($validator->fails()) {
             return response(
                 [
-                    'errors' => $validator->errors(),
+                    'error' => $validator->errors(),
                     'status' => Response::HTTP_BAD_REQUEST
                 ],
                 Response::HTTP_BAD_REQUEST
@@ -55,15 +59,15 @@ class ExamenController extends Controller
                     'mensaje' => 'Usted posee un turno para revisión ocular:',
                     'dia_hora' => $turno->fecha,
                     'Numero de turno' => $turno->id
-                ], 201);
+                ], Response::HTTP_OK);
             } else {
 
-                $token = $usuarioService->generarTokenUsuario(usuario_id: $usuario->id);
+                $token = $usuarioService->generarTokenUsuario(usuario_id: $usuario->id, preguntaService: $preguntaService);
                 return response([
                     'mensaje' => 'Puede iniciar el examen, conserve el siguiente token (1 hora de validez) :',
                     'token' => $token->token,
                     'expira' => Carbon::createFromFormat('Y-m-d H:i:s', $token->expires_at)->format("d/m/Y H:i")
-                ]);
+                ], Response::HTTP_OK);
             }
         } catch (Exception $error) {
             return response([$error->getMessage(), $error->getTraceAsString()], 500);
@@ -75,11 +79,11 @@ class ExamenController extends Controller
     public function pregunta($token, $orden, ExamenService $examenService)
     {
         $response = null;
-        $code = 200;
+        $code = Response::HTTP_OK;
 
         if (!$this->validToken($token)) {
-            $response = ['mensaje' => "Token inválido."];
-            $code = 401;
+            $response = ['error' => "Token inválido."];
+            $code = Response::HTTP_UNAUTHORIZED;
         } else {
 
             $response =    $examenService->obtenerPreguntaPorTokenOrden($token, $orden);
@@ -104,7 +108,7 @@ class ExamenController extends Controller
         if ($validator->fails()) {
             return response(
                 [
-                    'errors' => $validator->errors(),
+                    'error' => $validator->errors(),
                     'status' => Response::HTTP_BAD_REQUEST
                 ]
             );
@@ -113,10 +117,10 @@ class ExamenController extends Controller
         $respuesta_id = $request->post('respuesta_id');
         $numero_pregunta = $request->post('numero_pregunta');
         $response = [];
-        $code = 200;
+        $code = Response::HTTP_OK;
         if (!$this->validToken($token)) {
             $response = ['mensaje' => "Token inválido."];
-            $code = 401;
+            $code = Response::HTTP_UNAUTHORIZED;
         } else {
 
             if ($examenService->responderPreguntaPorTokenOrden($token, $numero_pregunta, $respuesta_id)) {
@@ -126,10 +130,10 @@ class ExamenController extends Controller
                 array_push($response, $proximoPaso);
             } else {
                 $response = [
-                    'mensaje' => "Ya no puede responder a este exámen.",
+                    'error' => "Ya no puede responder a este exámen.",
                     "Vea su resultado en:" => url("api/examen/resultado/?token=$token")
                 ];
-                $code = 404;
+                $code = Response::HTTP_NOT_FOUND;
             }
         }
         return response(
@@ -141,12 +145,12 @@ class ExamenController extends Controller
     public function resultado($id, ExamenService $examenService)
     {
         $resultado = "";
-        $code = 200;
+        $code = Response::HTTP_OK;
         try {
             $resultado = $examenService->obtenerExamenFinalizado($id);
         } catch (Exception $e) {
-            $resultado = ['mensaje'  => $e->getMessage()];
-            $code = 404;
+            $resultado = ['error'  => $e->getMessage()];
+            $code = Response::HTTP_NOT_FOUND;
         } finally {
             return response(
                 $resultado,
@@ -155,9 +159,17 @@ class ExamenController extends Controller
         }
     }
 
-    //TODO: armar el reporte de aprobados, desaprobados 
-    public function reporte(Request $request)
+    public function reporte($usuario_id, ExamenService $examenService)
     {
-        # code...
+        if (!$this->userValid($usuario_id)) {
+            return response(
+                [
+                    'error' => 'Usted no esta autorizado para ejecutar esta acción.',
+                    'status' => Response::HTTP_UNAUTHORIZED
+                ]
+            );
+        }
+
+        return response($examenService->reporte(), Response::HTTP_OK);
     }
 }

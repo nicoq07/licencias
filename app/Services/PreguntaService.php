@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Examen;
 use App\Models\Pregunta;
 use App\Models\Respuesta;
+use Carbon\Carbon;
 
 class PreguntaService
 {
@@ -26,5 +28,20 @@ class PreguntaService
     public function getPreguntas()
     {
         return Pregunta::with(['Respuesta'])->get();
+    }
+
+    public function aleatorizarPreguntas(Examen &$examen): Examen
+    {
+        $i = 1;
+        foreach (Pregunta::inRandomOrder()->limit(10)->get() as $pregunta) {
+            $examen->preguntas()->attach($pregunta->id, [
+                'orden' => $i,
+                'created_at' => Carbon::now()->toDateTimeString(),
+                'updated_at' => Carbon::now()->toDateTimeString(),
+            ]);
+            $i++;
+        }
+
+        return $examen;
     }
 }

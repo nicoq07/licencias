@@ -25,7 +25,7 @@ class TokenUsuarioService
         return $tokenUsuario;
     }
 
-    public function obtenerOCearTokenParaExamen($usuario_id)
+    public function obtenerOCearTokenParaExamen($usuario_id, PreguntaService $preguntaService)
     {
         $token = TokenUsuario::whereUsuarioId($usuario_id)->get()->first();
 
@@ -37,7 +37,7 @@ class TokenUsuarioService
             }
         } else {
             $examenService = new ExamenService();
-            $examenService->iniciarExamen($usuario_id);
+            $examenService->iniciarExamen($usuario_id, $preguntaService);
             $token = $this->crearToken($usuario_id);
             return $token;
         }
@@ -72,16 +72,13 @@ class TokenUsuarioService
     public function destruirToken($usuario_id, $token = null)
     {
         $tokenUsuario = TokenUsuario::whereUsuarioId($usuario_id);
-       
-        if($token)
-        {
+
+        if ($token) {
             $tokenUsuario =  $tokenUsuario->whereToken($token)->orWhere('expires_at', '>=', Carbon::now())->get()->first()->delete();
-        }
-        else{
+        } else {
             $tokenUsuario = $tokenUsuario->get()->first();
-            if($tokenUsuario) $tokenUsuario->delete();
-        }       
-        return true;     
-          
+            if ($tokenUsuario) $tokenUsuario->delete();
+        }
+        return true;
     }
 }

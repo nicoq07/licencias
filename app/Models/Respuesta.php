@@ -24,5 +24,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Respuesta extends Model
 {
+    protected $fillable = ['id', 'descripcion'];
     use HasFactory;
 }

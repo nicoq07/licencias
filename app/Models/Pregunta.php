@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Pregunta extends Model
 {
+    protected $fillable = ['id', 'descripcion', 'respuesta_id'];
     use HasFactory;
 
     public function respuesta()

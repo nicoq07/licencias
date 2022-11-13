@@ -18,11 +18,11 @@ class ExamenFactory extends Factory
     public function definition()
     {
         return [
-            'fecha' => $this->faker->dateTime(),
+            'fecha' => $this->faker->boolean(80) ? $this->faker->dateTime() : null,
             'usuario_id' => $this->faker->numberBetween(1, 4),
             'nota' => $this->faker->numberBetween(5, 10),
-            'intento' => 1,
-            'activo' => false
+            'intento' => $this->faker->numberBetween(1, 3),
+            'activo' => $this->faker->boolean(80)
         ];
     }
 }

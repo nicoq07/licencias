@@ -21,7 +21,7 @@ class ExamenService
     }
 
 
-    public function iniciarExamen($usuario_id)
+    public function iniciarExamen($usuario_id, PreguntaService $preguntaService)
     {
         $intento = $this->obtenerUltimoIntento($usuario_id);
         if ($intento >= 3) throw new Exception("Ya no posee intentos de Exámen.");
@@ -31,15 +31,17 @@ class ExamenService
         $examen->intento = $intento;
         $examen->save();
 
-        $i = 1;
-        foreach (Pregunta::inRandomOrder()->limit(10)->get() as $pregunta) {
-            $examen->preguntas()->attach($pregunta->id, [
-                'orden' => $i,
-                'created_at' => Carbon::now()->toDateTimeString(),
-                'updated_at' => Carbon::now()->toDateTimeString(),
-            ]);
-            $i++;
-        }
+        // $i = 1;
+        // foreach (Pregunta::inRandomOrder()->limit(10)->get() as $pregunta) {
+        //     $examen->preguntas()->attach($pregunta->id, [
+        //         'orden' => $i,
+        //         'created_at' => Carbon::now()->toDateTimeString(),
+        //         'updated_at' => Carbon::now()->toDateTimeString(),
+        //     ]);
+        //     $i++;
+        // }
+
+        $examen = $preguntaService->aleatorizarPreguntas($examen);
 
         $examen->save();
     }
@@ -155,5 +157,24 @@ class ExamenService
         } else {
             return 1;
         }
+    }
+
+    public function reporte()
+    {
+        $examenesAprobados = Examen::where('nota', '>=', 8)->where('fecha', '<>', null)->get()->count();
+        $examenesDesaprobados = Examen::where('nota', '<=', 7)->where('fecha', '<>', null)->get()->count();
+        $examenAbandonados = Examen::where('fecha', '=', null)->get()->count();
+        $examenesTotales = Examen::all()->count();
+
+        $porcentajeAprobados = round(($examenesAprobados / $examenesTotales) * 100, 2);
+        $porcentajeDesaprobados = round(($examenesDesaprobados / $examenesTotales) * 100, 2);
+        $porcentajeAbandonados = round(($examenAbandonados / $examenesTotales) * 100, 2);
+
+        return [
+            'examenesAprobados' => $examenesAprobados  . "(" . $porcentajeAprobados . "%)",
+            'examenesDesaprobados' => $examenesDesaprobados . "(" . $porcentajeDesaprobados . "%)",
+            'examenAbandonados' => $examenAbandonados . "(" . $porcentajeAbandonados . "%)",
+            'examenesTotales' => $examenesTotales,
+        ];
     }
 }

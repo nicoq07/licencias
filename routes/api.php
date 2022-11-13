@@ -30,16 +30,14 @@ Route::prefix('usuarios')->group(function () {
     Route::get('/', [UsuarioController::class, 'index']);
 });
 
-
-
 Route::prefix('examen')->group(function () {
 
     Route::get('/pregunta/{token}/{orden}', [ExamenController::class, 'pregunta']);
     Route::get('/resultado/{examen}', [ExamenController::class, 'resultado']);
-
-
     Route::post('/cuestionarioInicial', [ExamenController::class, 'cuestionarioInicial']);
     Route::post('/do', [ExamenController::class, 'doCuestionario']);
+
+    Route::get('/{usuarioId}/reporte/', [ExamenController::class, 'reporte']);
 });
 
 Route::prefix('pregunta')->group(function () {

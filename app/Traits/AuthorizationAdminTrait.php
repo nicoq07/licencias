@@ -11,7 +11,6 @@ trait AuthorizationAdminTrait
     public function userValid($usuario_id)
     {
         $usuario = Usuario::whereId($usuario_id)->first();
-
         if (!is_null($usuario)) {
 
             if ($usuario->rol_id == 1) {

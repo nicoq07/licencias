@@ -16,8 +16,8 @@ class PreguntaController extends Controller
     {
 
         $validator = Validator::make($request->post(), [
-            'pregunta' => 'required',
-            'respuesta' => 'required',
+            'pregunta_descripcion' => 'required',
+            'respuesta_descripcion' => 'required',
             'usuario_id' => 'required',
         ]);
         $data = $request->post();

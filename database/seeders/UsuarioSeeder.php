@@ -28,7 +28,7 @@ class UsuarioSeeder extends Seeder
             'persona_id' => 2,
             'nombre_usuario' => 'test2',
             'email' => 'test2@gmail.com',
-            'rol_id' => 2,
+            'rol_id' => 1,
             'activo' => true,
             'created_at' => Carbon::now(),
         ]);
@@ -44,6 +44,14 @@ class UsuarioSeeder extends Seeder
             'persona_id' => 4,
             'nombre_usuario' => 'test4',
             'email' => 'test4@gmail.com',
+            'rol_id' => 2,
+            'activo' => true,
+            'created_at' => Carbon::now(),
+        ]);
+        DB::table('usuarios')->insert([
+            'persona_id' => 501,
+            'nombre_usuario' => 'test501',
+            'email' => 'test501@gmail.com',
             'rol_id' => 2,
             'activo' => true,
             'created_at' => Carbon::now(),

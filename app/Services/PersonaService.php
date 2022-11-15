@@ -17,7 +17,7 @@ class PersonaService
         return $persona;
     }
 
-    public function obtenerPersonaPorDocummentoTipoDocumento($documento, $tipo_documento_id): Persona
+    public function obtenerPersonaPorDocummentoTipoDocumento($documento, $tipo_documento_id, $utiliza_anteojos): Persona
     {
         $persona = Persona::whereDocumento($documento)->whereTipoDocumentoId($tipo_documento_id)->firstOrFail();
         return $persona;

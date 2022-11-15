@@ -46,7 +46,7 @@ class ExamenController extends Controller
             $documento = $request->post('documento');
             $tipo_documento_id = $request->post('tipo_documento_id');
             $utiliza_anteojos = $request->post('utiliza_anteojos');
-            $persona = $personaService->obtenerPersonaPorDocummentoTipoDocumento(documento: $documento, tipo_documento_id: $tipo_documento_id);
+            $persona = $personaService->obtenerPersonaPorDocummentoTipoDocumento(documento: $documento, tipo_documento_id: $tipo_documento_id, utiliza_anteojos: $utiliza_anteojos);
             $usuario = $usuarioService->obtenerUsuarioPorPersonaId(persona_id: $persona->id);
             //ver si utiliza anteojos y actualizar en la clasePersona
             //Si utiliza generar un turno para una revision
@@ -59,7 +59,7 @@ class ExamenController extends Controller
                     'mensaje' => 'Usted posee un turno para revisión ocular:',
                     'dia_hora' => $turno->fecha,
                     'Numero de turno' => $turno->id
-                ], Response::HTTP_OK);
+                ], Response::HTTP_CREATED);
             } else {
 
                 $token = $usuarioService->generarTokenUsuario(usuario_id: $usuario->id, preguntaService: $preguntaService);
@@ -67,7 +67,7 @@ class ExamenController extends Controller
                     'mensaje' => 'Puede iniciar el examen, conserve el siguiente token (1 hora de validez) :',
                     'token' => $token->token,
                     'expira' => Carbon::createFromFormat('Y-m-d H:i:s', $token->expires_at)->format("d/m/Y H:i")
-                ], Response::HTTP_OK);
+                ], Response::HTTP_CREATED);
             }
         } catch (Exception $error) {
             return response([$error->getMessage(), $error->getTraceAsString()], 500);

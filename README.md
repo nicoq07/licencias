@@ -56,7 +56,6 @@ Renombrar el archivo .env.example a .env y copiar:
     DB_PASSWORD=secret
 
 ## Ejecutar Migraciones y Seeder
-
 Abrir una terminal en la carpeta "licencias" y ejecutar:
 
     Si es la primera vez:
